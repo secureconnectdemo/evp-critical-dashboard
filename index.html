@@ -6,7 +6,7 @@
   <title>EVP Critical Accounts Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.35.4/dist/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- if you want charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Optional: Only if using charts -->
 </head>
 <body>
 
@@ -25,8 +25,8 @@
 <main>
   <h2>Critical Accounts Overview</h2>
 
-  <!-- ✅ Add Account Form -->
-  <div class="add-account">
+  <!-- Add New Account Section -->
+  <div id="add-account-section" class="add-account" style="display: none;">
     <h3>Add New Critical Account</h3>
     <input type="text" id="customer_name" placeholder="Customer Name" required>
     <input type="number" id="arr_value" placeholder="ARR ($)" required>
@@ -43,8 +43,10 @@
     <button class="add-button" onclick="addAccount()">➕ Add Account</button>
   </div>
 
-  <!-- ✅ Filter and Save Controls -->
+  <!-- Filters and Actions -->
   <div class="filters">
+    <button onclick="toggleAddAccount()">➕ Postulate New Account</button>
+
     <select id="riskFilter" onchange="applyFilters()">
       <option value="">All Risks</option>
       <option value="High">High</option>
@@ -59,18 +61,18 @@
       <option value="Negative">Negative</option>
     </select>
 
-    <button onclick="login()">Login to Edit</button>
+    <button onclick="login()">🔒 Login to Edit</button>
     <button id="toggleModeButton" onclick="toggleEditMode()">Switch to Edit Mode</button>
     <button id="saveButton" onclick="saveData()">💾 Save All Data</button>
   </div>
 
-  <!-- ✅ Statistics -->
+  <!-- Statistics -->
   <div class="stats">
     <p>Total Open SRs: <span id="openSrsCount">0</span></p>
     <p>High-Risk Accounts: <span id="highRiskCount">0</span></p>
   </div>
 
-  <!-- ✅ Accounts Table -->
+  <!-- Accounts Table -->
   <table>
     <thead>
       <tr>
@@ -90,11 +92,11 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Accounts will be dynamically loaded here -->
+      <!-- Dynamically populated -->
     </tbody>
   </table>
 
-  <!-- ✅ Aging Trends Chart -->
+  <!-- Aging Chart -->
   <canvas id="agingChart" width="400" height="150"></canvas>
 
 </main>
@@ -103,12 +105,20 @@
   Cisco Critical Account Program Dashboard - Internal Use Only
 </footer>
 
+<!-- External JS Logic -->
 <script src="supabase.js"></script>
 
-<!-- ✅ Local Inline Script: Toggle Edit Mode -->
+<!-- Toggle Edit Mode Logic -->
 <script>
 let editMode = false;
 
+// Toggle Add New Account Section
+function toggleAddAccount() {
+  const section = document.getElementById('add-account-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+}
+
+// Toggle Edit/View Mode
 function toggleEditMode() {
   editMode = !editMode;
   const button = document.getElementById('toggleModeButton');
