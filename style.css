@@ -1,0 +1,19 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+header { background: #003366; color: white; padding: 10px 20px; text-align: center; }
+nav { background: #00509e; padding: 10px; display: flex; justify-content: center; }
+nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
+main { padding: 20px; }
+table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 20px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background: #0077cc; color: white; }
+td[contenteditable="true"] { background-color: #e8f0fe; }
+.risk-high { color: red; font-weight: bold; }
+.risk-medium { color: orange; font-weight: bold; }
+.risk-low { color: green; font-weight: bold; }
+.expand-button { cursor: pointer; color: #0077cc; background: none; border: none; text-decoration: underline; font-size: 1em; }
+.details { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background: #eef6fb; padding: 0 20px; border-left: 4px solid #0077cc; }
+.details.open { max-height: 1000px; padding: 10px 20px; }
+textarea, input { width: 100%; margin-top: 5px; margin-bottom: 10px; padding: 8px; }
+#saveButton, #toggleModeButton { background-color: #0077cc; color: white; padding: 10px 20px; border: none; margin-right: 10px; cursor: pointer; }
+footer { text-align: center; padding: 10px; background: #003366; color: white; position: fixed; bottom: 0; width: 100%; }
+button.add-button { background: #00509e; color: white; border: none; padding: 5px 10px; cursor: pointer; margin-top: 5px; }
