@@ -15,7 +15,7 @@ async function loadAccounts() {
   data.forEach(account => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td contenteditable="true">${account.customer_name}</td>
+      <td contenteditable="true">${account.customer_name ?? ''}</td>
       <td contenteditable="true">${account.arr_value ?? ''}</td>
       <td contenteditable="true">${account.segment ?? ''}</td>
       <td contenteditable="true">${account.logo_importance ?? ''}</td>
@@ -23,7 +23,7 @@ async function loadAccounts() {
       <td contenteditable="true">${account.cap_status ?? ''}</td>
       <td contenteditable="true">${account.escalation_type ?? ''}</td>
       <td contenteditable="true">${account.open_srs ?? ''}</td>
-      <td contenteditable="true" class="risk-${(account.sentiment ?? '').toLowerCase()}">${account.sentiment ?? ''}</td>
+      <td contenteditable="true">${account.sentiment ?? ''}</td>
       <td contenteditable="true">${account.risks ?? ''}</td>
       <td contenteditable="true">${account.next_exec_call ?? ''}</td>
       <td contenteditable="true">${account.owner ?? ''}</td>
@@ -59,7 +59,7 @@ async function saveData() {
   const rows = document.querySelectorAll('tbody tr:not(.details)');
   const updates = [];
 
-  rows.forEach((row, index) => {
+  rows.forEach(row => {
     const cells = row.querySelectorAll('td');
     const account = {
       customer_name: cells[0]?.innerText.trim(),
@@ -79,9 +79,7 @@ async function saveData() {
   });
 
   for (const update of updates) {
-    const { error } = await supabase
-      .from('critical_accounts')
-      .upsert(update, { onConflict: 'customer_name' }); // assumes `customer_name` is unique
+    const { error } = await supabase.from('critical_accounts').upsert(update, { onConflict: 'customer_name' });
     if (error) {
       console.error('Error saving data:', error);
     }
