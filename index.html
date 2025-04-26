@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>EVP Critical Accounts Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.35.4/dist/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- if you want charts -->
 </head>
 <body>
 
@@ -39,16 +40,37 @@
     <input type="text" id="risks" placeholder="Risks" required>
     <input type="date" id="next_exec_call" placeholder="Next Exec Call" required>
     <input type="text" id="owner" placeholder="Owner" required>
-    <button onclick="addAccount()">➕ Add Account</button>
+    <button class="add-button" onclick="addAccount()">➕ Add Account</button>
   </div>
 
-  <!-- ✅ Buttons -->
-  <div style="margin-top: 20px;">
-    <button id="saveButton" onclick="saveData()">Save All Data</button>
+  <!-- ✅ Filter and Save Controls -->
+  <div class="filters">
+    <select id="riskFilter" onchange="applyFilters()">
+      <option value="">All Risks</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+
+    <select id="sentimentFilter" onchange="applyFilters()">
+      <option value="">All Sentiments</option>
+      <option value="Positive">Positive</option>
+      <option value="Neutral">Neutral</option>
+      <option value="Negative">Negative</option>
+    </select>
+
+    <button onclick="login()">Login to Edit</button>
     <button id="toggleModeButton" onclick="toggleEditMode()">Switch to Edit Mode</button>
+    <button id="saveButton" onclick="saveData()">💾 Save All Data</button>
   </div>
 
-  <!-- ✅ Table -->
+  <!-- ✅ Statistics -->
+  <div class="stats">
+    <p>Total Open SRs: <span id="openSrsCount">0</span></p>
+    <p>High-Risk Accounts: <span id="highRiskCount">0</span></p>
+  </div>
+
+  <!-- ✅ Accounts Table -->
   <table>
     <thead>
       <tr>
@@ -68,9 +90,12 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Accounts will load here dynamically -->
+      <!-- Accounts will be dynamically loaded here -->
     </tbody>
   </table>
+
+  <!-- ✅ Aging Trends Chart -->
+  <canvas id="agingChart" width="400" height="150"></canvas>
 
 </main>
 
@@ -80,7 +105,7 @@
 
 <script src="supabase.js"></script>
 
-<!-- ✅ Local toggle edit mode script -->
+<!-- ✅ Local Inline Script: Toggle Edit Mode -->
 <script>
 let editMode = false;
 
