@@ -1,4 +1,4 @@
-// supabase.js - Polished Production Version
+// supabase.js - Final Polished Version
 
 const supabaseUrl = 'https://yfobxujnrljyxpwgemnc.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmb2J4dWpucmxqeXhwd2dlbW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNTM5NTcsImV4cCI6MjA2MDcyOTk1N30.kh9rZ2ykxLTSJ0pv4Nof38ma2eN8xE2O0p6ULHNKO28';
@@ -99,12 +99,12 @@ async function saveData() {
     }
   }
 
-  alert('Data saved!');
+  alert('✅ Data saved successfully!');
 }
 
 function applyFilters() {
-  const risk = document.getElementById('riskFilter').value.toLowerCase();
-  const sentiment = document.getElementById('sentimentFilter').value.toLowerCase();
+  const risk = document.getElementById('riskFilter')?.value.toLowerCase() || '';
+  const sentiment = document.getElementById('sentimentFilter')?.value.toLowerCase() || '';
 
   document.querySelectorAll('tbody tr:not(.details)').forEach(tr => {
     const riskCell = tr.querySelector('td:nth-child(10)')?.innerText.toLowerCase() ?? '';
@@ -133,12 +133,17 @@ function updateStatistics() {
     if (riskLevel === 'high') highRiskCount++;
   });
 
-  document.getElementById('openSrsCount').innerText = openSrsTotal;
-  document.getElementById('highRiskCount').innerText = highRiskCount;
+  const openSrsCount = document.getElementById('openSrsCount');
+  const highRiskCountElement = document.getElementById('highRiskCount');
+
+  if (openSrsCount) openSrsCount.innerText = openSrsTotal;
+  if (highRiskCountElement) highRiskCountElement.innerText = highRiskCount;
 }
 
 function renderAgingChart(dataAgingArray) {
-  const ctx = document.getElementById('agingChart').getContext('2d');
+  const ctx = document.getElementById('agingChart')?.getContext('2d');
+  if (!ctx) return;
+
   new Chart(ctx, {
     type: 'bar',
     data: {
@@ -151,11 +156,68 @@ function renderAgingChart(dataAgingArray) {
     },
     options: {
       responsive: true,
-      scales: { y: { beginAtZero: true } }
+      scales: {
+        y: { beginAtZero: true }
+      }
     }
   });
 }
 
 function login() {
   const password = prompt('Enter password to enable editing:');
-  if (password === 'admin123'
+  if (password === 'admin123') {
+    toggleEditMode();
+    alert('✅ Editing unlocked!');
+  } else {
+    alert('❌ Incorrect password. Access denied.');
+  }
+}
+
+function toggleEditMode() {
+  editMode = !editMode;
+  const button = document.getElementById('toggleModeButton');
+  const inputs = document.querySelectorAll('input, textarea');
+  const editableCells = document.querySelectorAll('td[contenteditable]');
+
+  if (editMode) {
+    button.textContent = "Switch to View Mode";
+    inputs.forEach(input => input.removeAttribute('readonly'));
+    editableCells.forEach(cell => cell.setAttribute('contenteditable', 'true'));
+  } else {
+    button.textContent = "Switch to Edit Mode";
+    inputs.forEach(input => input.setAttribute('readonly', true));
+    editableCells.forEach(cell => cell.setAttribute('contenteditable', 'false'));
+  }
+}
+
+async function addAccount() {
+  const account = {
+    customer_name: document.getElementById('customer_name').value.trim(),
+    arr_value: parseFloat(document.getElementById('arr_value').value.trim()) || null,
+    segment: document.getElementById('segment').value.trim(),
+    logo_importance: document.getElementById('logo_importance').value.trim(),
+    products: document.getElementById('products').value.trim(),
+    cap_status: document.getElementById('cap_status').value.trim(),
+    escalation_type: document.getElementById('escalation_type').value.trim(),
+    open_srs: document.getElementById('open_srs').value.trim(),
+    sentiment: document.getElementById('sentiment').value.trim(),
+    risks: document.getElementById('risks').value.trim(),
+    next_exec_call: document.getElementById('next_exec_call').value,
+    owner: document.getElementById('owner').value.trim()
+  };
+
+  const { error } = await supabase.from('critical_accounts').insert([account]);
+
+  if (error) {
+    console.error('Error adding account:', error);
+    alert('❌ Failed to add account.');
+  } else {
+    alert('✅ Account added successfully!');
+    loadAccounts();
+    clearFormFields();
+  }
+}
+
+function clearFormFields() {
+  document.querySelectorAll('.add-account input').forEach(input => input.value = '');
+}
