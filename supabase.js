@@ -1,4 +1,4 @@
-// supabase.js - Final Polished Version
+// supabase.js - Final Polished and Structured
 
 const supabaseUrl = 'https://yfobxujnrljyxpwgemnc.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmb2J4dWpucmxqeXhwd2dlbW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNTM5NTcsImV4cCI6MjA2MDcyOTk1N30.kh9rZ2ykxLTSJ0pv4Nof38ma2eN8xE2O0p6ULHNKO28';
@@ -6,7 +6,9 @@ const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 let editMode = false;
 
-// Load existing accounts
+// ========================
+// Load Accounts
+// ========================
 async function loadAccounts() {
   try {
     const { data, error } = await supabase.from('critical_accounts').select('*');
@@ -18,39 +20,7 @@ async function loadAccounts() {
     const agingData = [];
 
     data.forEach(account => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td contenteditable="true">${account.customer_name ?? ''}</td>
-        <td contenteditable="true">${account.arr_value ?? ''}</td>
-        <td contenteditable="true">${account.segment ?? ''}</td>
-        <td contenteditable="true">${account.logo_importance ?? ''}</td>
-        <td contenteditable="true">${account.products ?? ''}</td>
-        <td contenteditable="true">${account.cap_status ?? ''}</td>
-        <td contenteditable="true">${account.escalation_type ?? ''}</td>
-        <td contenteditable="true">${account.open_srs ?? ''}</td>
-        <td contenteditable="true">${account.sentiment ?? ''}</td>
-        <td contenteditable="true">${account.risks ?? ''}</td>
-        <td contenteditable="true">${account.next_exec_call ?? ''}</td>
-        <td contenteditable="true">${account.owner ?? ''}</td>
-        <td><button class="expand-button" onclick="toggleDetails('details-${account.id}')">Expand</button></td>
-      `;
-      tbody.appendChild(tr);
-
-      const detailsTr = document.createElement('tr');
-      detailsTr.id = `details-${account.id}`;
-      detailsTr.className = 'details';
-      detailsTr.innerHTML = `
-        <td colspan="13">
-          <strong>Deployment Phase:</strong> <span contenteditable="true">${account.deployment_phase ?? ''}</span><br>
-          <strong>Blocker Type:</strong> <span contenteditable="true">${account.blocker_type ?? ''}</span><br>
-          <strong>Critical Timeframe:</strong> <span contenteditable="true">${account.critical_timeframe ?? ''}</span><br>
-          <strong>Feature Requests:</strong> <div contenteditable="true">${account.feature_requests ?? ''}</div><br>
-          <strong>Support Tickets:</strong> <div contenteditable="true">${account.support_tickets ?? ''}</div><br>
-          <strong>Comments:</strong> <textarea>${account.comments ?? ''}</textarea>
-        </td>
-      `;
-      tbody.appendChild(detailsTr);
-
+      renderAccountRow(account);
       if (account.last_updated) {
         const daysOld = Math.floor((Date.now() - new Date(account.last_updated).getTime()) / (1000 * 60 * 60 * 24));
         agingData.push({ label: account.customer_name, days: daysOld });
@@ -61,20 +31,60 @@ async function loadAccounts() {
     renderAgingChart(agingData);
 
   } catch (err) {
-    console.error('Failed to load accounts:', err.message);
-    alert('❌ Error loading accounts.');
+    console.error('❌ Error loading accounts:', err.message);
+    alert('❌ Failed to load accounts.');
   }
 }
 
-// Save edited data
+// ========================
+// Render Single Account Row
+// ========================
+function renderAccountRow(account) {
+  const tbody = document.querySelector('tbody');
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td contenteditable="true">${account.customer_name ?? ''}</td>
+    <td contenteditable="true">${account.arr_value ?? ''}</td>
+    <td contenteditable="true">${account.segment ?? ''}</td>
+    <td contenteditable="true">${account.logo_importance ?? ''}</td>
+    <td contenteditable="true">${account.products ?? ''}</td>
+    <td contenteditable="true">${account.cap_status ?? ''}</td>
+    <td contenteditable="true">${account.escalation_type ?? ''}</td>
+    <td contenteditable="true">${account.open_srs ?? ''}</td>
+    <td contenteditable="true">${account.sentiment ?? ''}</td>
+    <td contenteditable="true">${account.risks ?? ''}</td>
+    <td contenteditable="true">${account.next_exec_call ?? ''}</td>
+    <td contenteditable="true">${account.owner ?? ''}</td>
+    <td><button class="expand-button" onclick="toggleDetails('details-${account.id}')">Expand</button></td>
+  `;
+  tbody.appendChild(tr);
+
+  const detailsTr = document.createElement('tr');
+  detailsTr.id = `details-${account.id}`;
+  detailsTr.className = 'details';
+  detailsTr.innerHTML = `
+    <td colspan="13">
+      <strong>Deployment Phase:</strong> <span contenteditable="true">${account.deployment_phase ?? ''}</span><br>
+      <strong>Blocker Type:</strong> <span contenteditable="true">${account.blocker_type ?? ''}</span><br>
+      <strong>Critical Timeframe:</strong> <span contenteditable="true">${account.critical_timeframe ?? ''}</span><br>
+      <strong>Feature Requests:</strong> <div contenteditable="true">${account.feature_requests ?? ''}</div><br>
+      <strong>Support Tickets:</strong> <div contenteditable="true">${account.support_tickets ?? ''}</div><br>
+      <strong>Comments:</strong> <textarea>${account.comments ?? ''}</textarea>
+    </td>
+  `;
+  tbody.appendChild(detailsTr);
+}
+
+// ========================
+// Save Data
+// ========================
 async function saveData() {
   try {
     const rows = document.querySelectorAll('tbody tr:not(.details)');
-    const updates = [];
-
-    rows.forEach(row => {
+    const updates = Array.from(rows).map(row => {
       const cells = row.querySelectorAll('td');
-      const account = {
+      return {
         customer_name: cells[0]?.innerText.trim(),
         arr_value: parseFloat(cells[1]?.innerText.trim()) || null,
         segment: cells[2]?.innerText.trim(),
@@ -88,7 +98,6 @@ async function saveData() {
         next_exec_call: cells[10]?.innerText.trim(),
         owner: cells[11]?.innerText.trim()
       };
-      updates.push(account);
     });
 
     for (const update of updates) {
@@ -96,16 +105,18 @@ async function saveData() {
       if (error) throw error;
     }
 
-    alert('✅ Data saved successfully!');
+    alert('✅ All changes saved!');
     await loadAccounts();
 
   } catch (err) {
-    console.error('Failed to save:', err.message);
-    alert('❌ Error saving data.');
+    console.error('❌ Error saving data:', err.message);
+    alert('❌ Failed to save data.');
   }
 }
 
-// Add a new account
+// ========================
+// Add New Account
+// ========================
 async function addAccount() {
   try {
     const account = {
@@ -131,17 +142,23 @@ async function addAccount() {
     clearFormFields();
 
   } catch (err) {
-    console.error('Failed to add account:', err.message);
-    alert('❌ Error adding account.');
+    console.error('❌ Error adding account:', err.message);
+    alert('❌ Failed to add account.');
   }
 }
 
-// Clear Add Form after insert
+// ========================
+// Utility Functions
+// ========================
 function clearFormFields() {
   document.querySelectorAll('.add-account input').forEach(input => input.value = '');
 }
 
-// Filter by risk and sentiment
+function toggleDetails(id) {
+  const details = document.getElementById(id);
+  if (details) details.classList.toggle('open');
+}
+
 function applyFilters() {
   const risk = document.getElementById('riskFilter')?.value.toLowerCase() || '';
   const sentiment = document.getElementById('sentimentFilter')?.value.toLowerCase() || '';
@@ -149,77 +166,60 @@ function applyFilters() {
   document.querySelectorAll('tbody tr:not(.details)').forEach(tr => {
     const riskCell = tr.querySelector('td:nth-child(10)')?.innerText.toLowerCase() ?? '';
     const sentimentCell = tr.querySelector('td:nth-child(9)')?.innerText.toLowerCase() ?? '';
-
-    const matchesRisk = !risk || riskCell.includes(risk);
-    const matchesSentiment = !sentiment || sentimentCell.includes(sentiment);
-
-    tr.style.display = (matchesRisk && matchesSentiment) ? '' : 'none';
+    tr.style.display = (riskCell.includes(risk) && sentimentCell.includes(sentiment)) ? '' : 'none';
   });
 
   updateStatistics();
 }
 
-// Update statistics
 function updateStatistics() {
   let openSrsTotal = 0;
   let highRiskCount = 0;
 
   document.querySelectorAll('tbody tr:not(.details)').forEach(tr => {
     if (tr.style.display === 'none') return;
-
     const openSrs = parseInt(tr.querySelector('td:nth-child(8)')?.innerText) || 0;
-    const riskLevel = tr.querySelector('td:nth-child(10)')?.innerText.toLowerCase();
+    const risk = tr.querySelector('td:nth-child(10)')?.innerText.toLowerCase();
 
     openSrsTotal += openSrs;
-    if (riskLevel === 'high') highRiskCount++;
+    if (risk === 'high') highRiskCount++;
   });
 
   document.getElementById('openSrsCount').innerText = openSrsTotal;
   document.getElementById('highRiskCount').innerText = highRiskCount;
 }
 
-// Render aging trends chart
-function renderAgingChart(dataAgingArray) {
+function renderAgingChart(data) {
   const ctx = document.getElementById('agingChart')?.getContext('2d');
   if (!ctx) return;
 
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: dataAgingArray.map(d => d.label),
+      labels: data.map(d => d.label),
       datasets: [{
         label: 'Days Open',
-        data: dataAgingArray.map(d => d.days),
+        data: data.map(d => d.days),
         backgroundColor: 'steelblue'
       }]
     },
     options: {
       responsive: true,
-      scales: {
-        y: { beginAtZero: true }
-      }
+      scales: { y: { beginAtZero: true } }
     }
   });
 }
 
-// Toggle details row
-function toggleDetails(id) {
-  const details = document.getElementById(id);
-  details.classList.toggle('open');
-}
-
-// Basic login
 function login() {
   const password = prompt('Enter password to enable editing:');
   if (password === 'admin123') {
     toggleEditMode();
     alert('✅ Editing unlocked!');
   } else {
-    alert('❌ Incorrect password. Access denied.');
+    alert('❌ Incorrect password.');
   }
 }
 
-// Toggle edit mode
 function toggleEditMode() {
   editMode = !editMode;
   const button = document.getElementById('toggleModeButton');
@@ -237,5 +237,7 @@ function toggleEditMode() {
   }
 }
 
-// Initialize
+// ========================
+// Init
+// ========================
 document.addEventListener('DOMContentLoaded', loadAccounts);
