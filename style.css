@@ -2,28 +2,35 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background: #f4f4f4;
 }
 
 header {
   background: #003366;
   color: white;
-  padding: 10px 20px;
+  padding: 15px 20px;
   text-align: center;
+  font-size: 1.8em;
+  font-weight: bold;
 }
 
 nav {
   background: #00509e;
-  padding: 10px;
   display: flex;
   justify-content: center;
+  gap: 20px;
+  padding: 10px;
 }
 
 nav a {
   color: white;
-  margin: 0 15px;
   text-decoration: none;
   font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #ffcc00;
 }
 
 main {
@@ -31,8 +38,45 @@ main {
 }
 
 .filters, .stats {
-  margin: 10px 0;
+  margin: 20px 0;
   text-align: center;
+}
+
+.filters select, .filters button {
+  margin: 0 5px;
+}
+
+.add-account {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.add-account input {
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-account .add-button {
+  width: 100%;
+  background: #00509e;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+.add-account .add-button:hover {
+  background: #004080;
 }
 
 table {
@@ -40,11 +84,12 @@ table {
   border-collapse: collapse;
   background: white;
   margin-top: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 th, td {
-  padding: 12px;
+  padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #ddd;
 }
@@ -52,6 +97,7 @@ th, td {
 th {
   background: #0077cc;
   color: white;
+  font-weight: bold;
 }
 
 td[contenteditable="true"] {
@@ -83,9 +129,8 @@ td[contenteditable="true"] {
 
 textarea, input {
   width: 100%;
-  margin-top: 5px;
-  margin-bottom: 10px;
   padding: 8px;
+  border-radius: 4px;
 }
 
 #saveButton, #toggleModeButton {
@@ -95,15 +140,12 @@ textarea, input {
   border: none;
   margin-right: 10px;
   cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
 }
 
-button.add-button {
-  background: #00509e;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  margin-top: 5px;
+#saveButton:hover, #toggleModeButton:hover {
+  background-color: #005999;
 }
 
 .risk-high {
@@ -123,11 +165,12 @@ button.add-button {
 
 footer {
   text-align: center;
-  padding: 10px;
+  padding: 15px;
   background: #003366;
   color: white;
+  font-size: 0.9em;
   position: fixed;
   bottom: 0;
   width: 100%;
+  z-index: 999;
 }
-
