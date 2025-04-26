@@ -45,7 +45,7 @@
 
   <!-- Filters and Actions -->
   <div class="filters">
-    <button onclick="toggleAddAccount()">➕ Postulate New Account</button>
+    <button id="toggleAddAccountButton" onclick="toggleAddAccount()">➕ Postulate New Account</button>
 
     <select id="riskFilter" onchange="applyFilters()">
       <option value="">All Risks</option>
@@ -108,14 +108,22 @@
 <!-- External JS Logic -->
 <script src="supabase.js"></script>
 
-<!-- Toggle Edit Mode Logic -->
+<!-- Local Inline Script -->
 <script>
 let editMode = false;
 
 // Toggle Add New Account Section
 function toggleAddAccount() {
   const section = document.getElementById('add-account-section');
-  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+  const button = document.getElementById('toggleAddAccountButton');
+
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    button.innerHTML = "➖ Cancel New Account";
+  } else {
+    section.style.display = 'none';
+    button.innerHTML = "➕ Postulate New Account";
+  }
 }
 
 // Toggle Edit/View Mode
