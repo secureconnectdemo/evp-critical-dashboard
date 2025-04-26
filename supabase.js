@@ -55,6 +55,37 @@ function toggleDetails(id) {
   details.classList.toggle('open');
 }
 
-function saveData() {
-  alert('Save function to Supabase coming next!');
+async function saveData() {
+  const rows = document.querySelectorAll('tbody tr:not(.details)');
+  const updates = [];
+
+  rows.forEach((row, index) => {
+    const cells = row.querySelectorAll('td');
+    const account = {
+      customer_name: cells[0]?.innerText.trim(),
+      arr_value: parseFloat(cells[1]?.innerText.trim()) || null,
+      segment: cells[2]?.innerText.trim(),
+      logo_importance: cells[3]?.innerText.trim(),
+      products: cells[4]?.innerText.trim(),
+      cap_status: cells[5]?.innerText.trim(),
+      escalation_type: cells[6]?.innerText.trim(),
+      open_srs: cells[7]?.innerText.trim(),
+      sentiment: cells[8]?.innerText.trim(),
+      risks: cells[9]?.innerText.trim(),
+      next_exec_call: cells[10]?.innerText.trim(),
+      owner: cells[11]?.innerText.trim()
+    };
+    updates.push(account);
+  });
+
+  for (const update of updates) {
+    const { error } = await supabase
+      .from('critical_accounts')
+      .upsert(update, { onConflict: 'customer_name' }); // assumes `customer_name` is unique
+    if (error) {
+      console.error('Error saving data:', error);
+    }
+  }
+
+  alert('Data saved!');
 }
