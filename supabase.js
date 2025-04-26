@@ -1,6 +1,10 @@
+// supabase.js - Polished Production Version
+
 const supabaseUrl = 'https://yfobxujnrljyxpwgemnc.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlmb2J4dWpucmxqeXhwd2dlbW5jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNTM5NTcsImV4cCI6MjA2MDcyOTk1N30.kh9rZ2ykxLTSJ0pv4Nof38ma2eN8xE2O0p6ULHNKO28';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+let editMode = false;
 
 async function loadAccounts() {
   const { data, error } = await supabase.from('critical_accounts').select('*');
@@ -11,6 +15,8 @@ async function loadAccounts() {
 
   const tbody = document.querySelector('tbody');
   tbody.innerHTML = '';
+
+  const agingData = [];
 
   data.forEach(account => {
     const tr = document.createElement('tr');
@@ -45,7 +51,15 @@ async function loadAccounts() {
       </td>
     `;
     tbody.appendChild(detailsTr);
+
+    if (account.last_updated) {
+      const daysOld = Math.floor((Date.now() - new Date(account.last_updated).getTime()) / (1000 * 60 * 60 * 24));
+      agingData.push({ label: account.customer_name, days: daysOld });
+    }
   });
+
+  updateStatistics();
+  renderAgingChart(agingData);
 }
 
 document.addEventListener('DOMContentLoaded', loadAccounts);
@@ -87,3 +101,61 @@ async function saveData() {
 
   alert('Data saved!');
 }
+
+function applyFilters() {
+  const risk = document.getElementById('riskFilter').value.toLowerCase();
+  const sentiment = document.getElementById('sentimentFilter').value.toLowerCase();
+
+  document.querySelectorAll('tbody tr:not(.details)').forEach(tr => {
+    const riskCell = tr.querySelector('td:nth-child(10)')?.innerText.toLowerCase() ?? '';
+    const sentimentCell = tr.querySelector('td:nth-child(9)')?.innerText.toLowerCase() ?? '';
+
+    const matchesRisk = !risk || riskCell.includes(risk);
+    const matchesSentiment = !sentiment || sentimentCell.includes(sentiment);
+
+    tr.style.display = (matchesRisk && matchesSentiment) ? '' : 'none';
+  });
+
+  updateStatistics();
+}
+
+function updateStatistics() {
+  let openSrsTotal = 0;
+  let highRiskCount = 0;
+
+  document.querySelectorAll('tbody tr:not(.details)').forEach(tr => {
+    if (tr.style.display === 'none') return;
+
+    const openSrs = parseInt(tr.querySelector('td:nth-child(8)')?.innerText) || 0;
+    const riskLevel = tr.querySelector('td:nth-child(10)')?.innerText.toLowerCase();
+
+    openSrsTotal += openSrs;
+    if (riskLevel === 'high') highRiskCount++;
+  });
+
+  document.getElementById('openSrsCount').innerText = openSrsTotal;
+  document.getElementById('highRiskCount').innerText = highRiskCount;
+}
+
+function renderAgingChart(dataAgingArray) {
+  const ctx = document.getElementById('agingChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dataAgingArray.map(d => d.label),
+      datasets: [{
+        label: 'Days Open',
+        data: dataAgingArray.map(d => d.days),
+        backgroundColor: 'steelblue'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+
+function login() {
+  const password = prompt('Enter password to enable editing:');
+  if (password === 'admin123'
