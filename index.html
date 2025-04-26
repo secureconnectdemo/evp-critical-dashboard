@@ -24,9 +24,31 @@
 <main>
   <h2>Critical Accounts Overview</h2>
 
-  <button id="saveButton" onclick="saveData()">Save All Data</button>
-  <button id="toggleModeButton" onclick="toggleEditMode()">Switch to Edit Mode</button>
+  <!-- ✅ Add Account Form -->
+  <div class="add-account">
+    <h3>Add New Critical Account</h3>
+    <input type="text" id="customer_name" placeholder="Customer Name" required>
+    <input type="number" id="arr_value" placeholder="ARR ($)" required>
+    <input type="text" id="segment" placeholder="Segment" required>
+    <input type="text" id="logo_importance" placeholder="Logo Importance" required>
+    <input type="text" id="products" placeholder="Products" required>
+    <input type="text" id="cap_status" placeholder="CAP Status" required>
+    <input type="text" id="escalation_type" placeholder="Escalation Type" required>
+    <input type="number" id="open_srs" placeholder="Open SRs" required>
+    <input type="text" id="sentiment" placeholder="Sentiment" required>
+    <input type="text" id="risks" placeholder="Risks" required>
+    <input type="date" id="next_exec_call" placeholder="Next Exec Call" required>
+    <input type="text" id="owner" placeholder="Owner" required>
+    <button onclick="addAccount()">➕ Add Account</button>
+  </div>
 
+  <!-- ✅ Buttons -->
+  <div style="margin-top: 20px;">
+    <button id="saveButton" onclick="saveData()">Save All Data</button>
+    <button id="toggleModeButton" onclick="toggleEditMode()">Switch to Edit Mode</button>
+  </div>
+
+  <!-- ✅ Table -->
   <table>
     <thead>
       <tr>
@@ -49,6 +71,7 @@
       <!-- Accounts will load here dynamically -->
     </tbody>
   </table>
+
 </main>
 
 <footer>
@@ -56,6 +79,8 @@
 </footer>
 
 <script src="supabase.js"></script>
+
+<!-- ✅ Local toggle edit mode script -->
 <script>
 let editMode = false;
 
@@ -76,5 +101,6 @@ function toggleEditMode() {
   }
 }
 </script>
+
 </body>
 </html>
