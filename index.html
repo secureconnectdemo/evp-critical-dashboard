@@ -6,7 +6,6 @@
   <title>EVP Critical Accounts Dashboard</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.35.4/dist/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -25,8 +24,7 @@
 <main>
   <h2>Critical Accounts Overview</h2>
 
-  <!-- Add New Account Section -->
-  <div id="add-account-section" class="add-account" style="display: none;">
+  <div id="add-account-section" class="add-account" style="display:none;">
     <h3>Add New Critical Account</h3>
     <input type="text" id="customer_name" placeholder="Customer Name" required>
     <input type="number" id="arr_value" placeholder="ARR ($)" required>
@@ -43,36 +41,30 @@
     <button class="add-button" onclick="addAccount()">➕ Add Account</button>
   </div>
 
-  <!-- Filters and Actions -->
   <div class="filters">
     <button id="toggleAddAccountButton" onclick="toggleAddAccount()">➕ Postulate New Account</button>
-
     <select id="riskFilter" onchange="applyFilters()">
       <option value="">All Risks</option>
       <option value="High">High</option>
       <option value="Medium">Medium</option>
       <option value="Low">Low</option>
     </select>
-
     <select id="sentimentFilter" onchange="applyFilters()">
       <option value="">All Sentiments</option>
       <option value="Positive">Positive</option>
       <option value="Neutral">Neutral</option>
       <option value="Negative">Negative</option>
     </select>
-
-    <button id="loginButton" onclick="login()">🔒 Login to Edit</button>
-    <button id="toggleModeButton" onclick="toggleEditMode()" disabled>Switch to Edit Mode</button>
-    <button id="saveButton" onclick="saveData()" disabled>💾 Save All Data</button>
+    <button onclick="login()">🔒 Login to Edit</button>
+    <button id="toggleModeButton" onclick="toggleEditMode()">Switch to Edit Mode</button>
+    <button id="saveButton" onclick="saveData()">💾 Save All Data</button>
   </div>
 
-  <!-- Statistics -->
   <div class="stats">
     <p>Total Open SRs: <span id="openSrsCount">0</span></p>
     <p>High-Risk Accounts: <span id="highRiskCount">0</span></p>
   </div>
 
-  <!-- Accounts Table -->
   <table>
     <thead>
       <tr>
@@ -92,90 +84,21 @@
       </tr>
     </thead>
     <tbody>
-      <!-- Populated dynamically -->
     </tbody>
   </table>
 
-  <!-- Aging Chart -->
   <canvas id="agingChart" width="400" height="150"></canvas>
-
 </main>
 
 <footer>
   Cisco Critical Account Program Dashboard - Internal Use Only
 </footer>
 
-<!-- Toast Notification -->
-<div id="toast" class="toast"></div>
+<div id="toast-container"></div>
 
 <script src="supabase.js"></script>
-
-<!-- Inline Behavior Scripts -->
-<script>
-let editMode = false;
-
-// Toggle Add Account Section
-function toggleAddAccount() {
-  const section = document.getElementById('add-account-section');
-  const toggleButton = document.getElementById('toggleAddAccountButton');
-  if (section.style.display === 'none') {
-    section.style.display = 'block';
-    toggleButton.innerHTML = '➖ Cancel New Account';
-  } else {
-    section.style.display = 'none';
-    toggleButton.innerHTML = '➕ Postulate New Account';
-  }
-}
-
-// Login and Unlock Editing
-function login() {
-  const password = prompt("🔒 Enter admin password:");
-  if (password === "admin123") {
-    editMode = true;
-    toggleEditMode(true); 
-    document.getElementById('toggleModeButton').disabled = false;
-    document.getElementById('saveButton').disabled = false;
-    showToast('✅ Editing Unlocked!', '#28a745');
-  } else {
-    showToast('❌ Incorrect Password.', '#dc3545');
-  }
-}
-
-// Toggle Edit/View Mode
-function toggleEditMode(forceOn = null) {
-  if (forceOn !== null) {
-    editMode = forceOn;
-  } else {
-    editMode = !editMode;
-  }
-
-  const button = document.getElementById('toggleModeButton');
-  const inputs = document.querySelectorAll('input, textarea');
-  const editableCells = document.querySelectorAll('td[contenteditable]');
-
-  if (editMode) {
-    button.textContent = "Switch to View Mode";
-    inputs.forEach(input => input.removeAttribute('readonly'));
-    editableCells.forEach(cell => cell.setAttribute('contenteditable', 'true'));
-  } else {
-    button.textContent = "Switch to Edit Mode";
-    inputs.forEach(input => input.setAttribute('readonly', true));
-    editableCells.forEach(cell => cell.setAttribute('contenteditable', 'false'));
-  }
-}
-
-// Toast System
-function showToast(message, color = "#333") {
-  const toast = document.getElementById('toast');
-  toast.innerText = message;
-  toast.style.backgroundColor = color;
-  toast.className = "toast show";
-
-  setTimeout(() => {
-    toast.className = "toast";
-  }, 3000);
-}
-</script>
+<script src="toast.js"></script>
+<script src="dashboard.js"></script>
 
 </body>
 </html>
