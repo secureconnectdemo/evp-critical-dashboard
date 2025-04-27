@@ -61,9 +61,9 @@
       <option value="Negative">Negative</option>
     </select>
 
-    <button onclick="login()">🔒 Login to Edit</button>
-    <button id="toggleModeButton" onclick="toggleEditMode()">Switch to Edit Mode</button>
-    <button id="saveButton" onclick="saveData()">💾 Save All Data</button>
+    <button id="loginButton" onclick="login()">🔒 Login to Edit</button>
+    <button id="toggleModeButton" onclick="toggleEditMode()" disabled>Switch to Edit Mode</button>
+    <button id="saveButton" onclick="saveData()" disabled>💾 Save All Data</button>
   </div>
 
   <!-- Statistics -->
@@ -105,12 +105,16 @@
   Cisco Critical Account Program Dashboard - Internal Use Only
 </footer>
 
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
 <script src="supabase.js"></script>
 
 <!-- Inline Behavior Scripts -->
 <script>
 let editMode = false;
 
+// Toggle Add Account Section
 function toggleAddAccount() {
   const section = document.getElementById('add-account-section');
   const toggleButton = document.getElementById('toggleAddAccountButton');
@@ -123,52 +127,28 @@ function toggleAddAccount() {
   }
 }
 
-async function addAccount() {
-  const addButton = document.querySelector('.add-button');
-  const originalText = addButton.innerHTML;
-
-  try {
-    addButton.disabled = true;
-    addButton.innerHTML = '<span class="spinner"></span> Adding...';
-
-    const account = {
-      customer_name: document.getElementById('customer_name').value.trim() || 'N/A',
-      arr_value: parseFloat(document.getElementById('arr_value').value.trim()) || 0,
-      segment: document.getElementById('segment').value.trim() || 'N/A',
-      logo_importance: document.getElementById('logo_importance').value.trim() || 'N/A',
-      products: document.getElementById('products').value.trim() || 'N/A',
-      cap_status: document.getElementById('cap_status').value.trim() || 'N/A',
-      escalation_type: document.getElementById('escalation_type').value.trim() || 'N/A',
-      open_srs: document.getElementById('open_srs').value.trim() || '0',
-      sentiment: document.getElementById('sentiment').value.trim() || 'Neutral',
-      risks: document.getElementById('risks').value.trim() || 'None',
-      next_exec_call: document.getElementById('next_exec_call').value || null,
-      owner: document.getElementById('owner').value.trim() || 'Unknown'
-    };
-
-    const { error } = await supabase.from('critical_accounts').insert([account]);
-
-    if (error) {
-      console.error('Supabase Insert Error:', error);
-      alert(`❌ Failed to add account:\n${error.message}`);
-    } else {
-      alert('✅ Account added successfully!');
-      await loadAccounts();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      clearFormFields();
-      toggleAddAccount();
-    }
-  } catch (err) {
-    console.error('Unexpected error:', err.message);
-    alert(`❌ Unexpected error: ${err.message}`);
-  } finally {
-    addButton.disabled = false;
-    addButton.innerHTML = originalText;
+// Login and Unlock Editing
+function login() {
+  const password = prompt("🔒 Enter admin password:");
+  if (password === "admin123") {
+    editMode = true;
+    toggleEditMode(true); 
+    document.getElementById('toggleModeButton').disabled = false;
+    document.getElementById('saveButton').disabled = false;
+    showToast('✅ Editing Unlocked!', '#28a745');
+  } else {
+    showToast('❌ Incorrect Password.', '#dc3545');
   }
 }
 
-function toggleEditMode() {
-  editMode = !editMode;
+// Toggle Edit/View Mode
+function toggleEditMode(forceOn = null) {
+  if (forceOn !== null) {
+    editMode = forceOn;
+  } else {
+    editMode = !editMode;
+  }
+
   const button = document.getElementById('toggleModeButton');
   const inputs = document.querySelectorAll('input, textarea');
   const editableCells = document.querySelectorAll('td[contenteditable]');
@@ -182,6 +162,18 @@ function toggleEditMode() {
     inputs.forEach(input => input.setAttribute('readonly', true));
     editableCells.forEach(cell => cell.setAttribute('contenteditable', 'false'));
   }
+}
+
+// Toast System
+function showToast(message, color = "#333") {
+  const toast = document.getElementById('toast');
+  toast.innerText = message;
+  toast.style.backgroundColor = color;
+  toast.className = "toast show";
+
+  setTimeout(() => {
+    toast.className = "toast";
+  }, 3000);
 }
 </script>
 
